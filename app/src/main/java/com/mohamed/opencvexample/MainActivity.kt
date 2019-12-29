@@ -17,8 +17,7 @@ import org.opencv.imgproc.Imgproc
 
 
 class MainActivity : AppCompatActivity(), CameraBridgeViewBase.CvCameraViewListener2 {
-    var baseLoaderCallback: BaseLoaderCallback? = null
-    var counter = 0
+    private var baseLoaderCallback: BaseLoaderCallback? = null
 
     private val TAG = "TEST"
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,34 +41,33 @@ class MainActivity : AppCompatActivity(), CameraBridgeViewBase.CvCameraViewListe
     override fun onCameraFrame(inputFrame: CameraBridgeViewBase.CvCameraViewFrame): Mat {
         val input = inputFrame.gray()
         val circles = Mat()
-        Imgproc.blur(input, input, Size(7.0, 7.0), Point(2.0, 2.0))
+        Imgproc.blur(input, input, Size(5.0, 5.0), Point(3.0, 3.0))
         Imgproc.HoughCircles(
             input,
             circles,
             Imgproc.CV_HOUGH_GRADIENT,
-            2.0,
+            1.0,
+            10.0,
             100.0,
-            100.0,
-            90.0,
-            0,
-            1000
+            30.0,
+            1,
+            30
         )
 
-        Log.i(
-            TAG,
-            "size: " + circles.cols() + ", " + circles.rows().toString()
-        )
-
+        Log.i(TAG,
+            "size: " + circles.cols() + ", " + circles.rows().toString())
+        runOnUiThread {
+            textView.text = circles.cols().toString()
+        }
         if (circles.cols() > 0) {
-            for (x in 0 until Math.min(circles.cols(), 5)) {
+            for (x in 0 until Math.min(circles.cols(),100)) {
                 val circleVec = circles[0, x] ?: break
                 val center = Point(circleVec[0], circleVec[1])
                 val radius = circleVec[2].toInt()
-                Imgproc.circle(input, center, 3, Scalar(255.0, 255.0, 255.0), 5)
-                Imgproc.circle(input, center, radius, Scalar(255.0, 255.0, 255.0), 2)
+                Imgproc.circle(input, center, 3, Scalar(255.0, 255.0, 255.0), 5)//inner circle
+                Imgproc.circle(input, center, radius, Scalar(255.0, 255.0, 255.0), 2)//outer circle
             }
         }
-
         circles.release()
         input.release()
         return inputFrame.rgba()

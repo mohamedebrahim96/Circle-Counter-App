@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity(), CameraBridgeViewBase.CvCameraViewListe
     override fun onCameraFrame(inputFrame: CameraBridgeViewBase.CvCameraViewFrame): Mat {
         val input = inputFrame.gray()
         val circles = Mat()
-        Imgproc.blur(input, input, Size(5.0, 5.0), Point(3.0, 3.0))
+        Imgproc.blur(input, input, Size(5.0, 5.0), Point(2.0, 2.0))
         Imgproc.HoughCircles(
             input,
             circles,
@@ -54,13 +54,15 @@ class MainActivity : AppCompatActivity(), CameraBridgeViewBase.CvCameraViewListe
             30
         )
 
-        Log.i(TAG,
-            "size: " + circles.cols() + ", " + circles.rows().toString())
+        Log.i(
+            TAG,
+            "size: " + circles.cols() + ", " + circles.rows().toString()
+        )
         runOnUiThread {
             textView.text = circles.cols().toString()
         }
         if (circles.cols() > 0) {
-            for (x in 0 until Math.min(circles.cols(),100)) {
+            for (x in 0 until Math.min(circles.cols(), 100)) {
                 val circleVec = circles[0, x] ?: break
                 val center = Point(circleVec[0], circleVec[1])
                 val radius = circleVec[2].toInt()
